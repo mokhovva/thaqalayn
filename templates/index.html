@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثقلین - بازی حکیم قرآن و عترت</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== تنظیمات اختصاصی ===== */
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #langScreen {
+            display: none !important;
+        }
+        /* منوی بالا سمت چپ */
+        .top-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+        .menu-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            color: #FFD700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+        }
+        .menu-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+            transform: translateY(-2px);
+        }
+        /* دکمه صدا در سمت راست بالا */
+        .audio-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        .icon-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            color: #FFD700;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+        }
+        /* منوی کاربر (کشویی) در سمت راست زیر دکمه صدا */
+        .user-info {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            z-index: 100;
+            cursor: pointer;
+        }
+        .user-info-main {
+            padding: 12px 22px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #FFD700;
+        }
+        .user-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 0;
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            min-width: 160px;
+            padding: 8px;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .user-dropdown-menu.show {
+            display: flex;
+        }
+        .dropdown-item {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: block;
+        }
+        .logout-item {
+            background: rgba(255, 82, 82, 0.2);
+            color: #ff5252;
+            border: 1px solid rgba(255, 82, 82, 0.4);
+        }
+        .logout-item:hover {
+            background: rgba(255, 82, 82, 0.5);
+            color: white;
+        }
+        .admin-item {
+            background: rgba(0, 230, 118, 0.2);
+            color: #00e676;
+            border: 1px solid rgba(0, 230, 118, 0.4);
+        }
+        .admin-item:hover {
+            background: rgba(0, 230, 118, 0.5);
+            color: white;
+        }
+        /* مودال محتوا */
+        .content-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .content-modal-box {
+            background: linear-gradient(145deg, #121228 0%, #0a0a1a 100%);
+            border-radius: 24px;
+            padding: 40px;
+            border: 2px solid #FFD700;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .content-modal-title, .content-modal-close {
+            display: none;
+        }
+        .content-modal-body {
+            color: #f5f5f5;
+            line-height: 2;
+            font-size: 1.1rem;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+        }
+        .edit-textarea {
+            width: 100%;
+            min-height: 200px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            color: white;
+            padding: 15px;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.8;
+            resize: vertical;
+            margin-top: 20px;
+        }
+        .edit-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
+            color: #0a0a1a;
+            font-weight: 700;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #FFD700;
+            border: 2px solid #FFD700;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        /* دکمه‌های انتخاب زبان */
+        .language-select {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 10px 0 20px;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            color: white;
+            font-size: 1.1rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        .lang-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+            transform: translateY(-3px);
+        }
+
+        /* Loading overlay to prevent blue flash */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        #loadingOverlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-top-color: #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* فاصله کافی از بالا تا عنوان ثقلین زیر منوی بالا قرار گیرد */
+        .container {
+            padding-top: 90px !important;
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+        }
+        .game-title {
+            margin-top: 20px !important;
+            padding-top: 0 !important;
+        }
+        .glass-card {
+            margin-top: 10px;
+        }
+        @media (max-width: 600px) {
+            .top-menu { top: 10px; left: 10px; }
+            .menu-btn { padding: 8px 15px; font-size: 0.9rem; }
+            .audio-control { top: 10px; right: 10px; }
+            .user-info { top: 80px; right: 10px; }
+            .user-info-main { padding: 8px 15px; }
+            .container { padding-top: 80px !important; }
+            .language-select { margin: 5px 0 15px; }
+            .lang-btn { padding: 8px 18px; font-size: 1rem; }
+            .content-modal-box { padding: 25px; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+    <!-- Loading overlay to prevent flash -->
+    <div id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+    <div class="background-overlay" id="backgroundOverlay"></div>
+    <div class="pattern-overlay"></div>
+
+    <!-- منوی بالا سمت چپ -->
+    <div class="top-menu">
+        <button class="menu-btn" id="aboutBtn">📖 درباره ما</button>
+        <button class="menu-btn" id="helpBtn">❓ راهنما</button>
+    </div>
+
+    <!-- دکمه صدا -->
+    <div class="audio-control">
+        <button class="icon-btn" id="audioToggleBtn">🔊</button>
+    </div>
+
+    <!-- منوی کاربر -->
+    <div class="user-info" id="userInfo" style="display: none;">
+        <div class="user-info-main" id="userInfoMain">
+            <span>👤</span>
+            <span id="userDisplay"></span>
+            <span style="font-size: 0.7rem;">▼</span>
+        </div>
+        <div class="user-dropdown-menu" id="userDropdownMenu">
+            <a href="/admin" class="dropdown-item admin-item" id="adminDropdownItem" style="display: none;">👑 پنل مدیریت</a>
+            <button class="dropdown-item logout-item" id="logoutBtn" onclick="logout()">🚪 خروج از حساب</button>
+        </div>
+    </div>
+
+    <audio id="bgAudio" loop preload="auto"></audio>
+
+    <!-- مودال محتوا -->
+    <div class="content-modal" id="contentModal">
+        <div class="content-modal-box">
+            <div class="content-modal-body" id="contentModalBody"></div>
+            <div id="editSection" style="display: none;">
+                <textarea class="edit-textarea" id="contentEditArea"></textarea>
+                <div class="edit-actions">
+                    <button class="btn btn-primary" id="saveContentBtn" onclick="saveContent()">💾 ذخیره</button>
+                    <button class="btn btn-secondary" id="cancelEditBtn" onclick="cancelEdit()">✕ انصراف</button>
+                </div>
+            </div>
+            <div class="edit-actions" id="contentActions">
+                <button class="btn btn-secondary" id="closeModalBtn" onclick="closeContentModal()">بستن</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- صفحه ورود -->
+        <div class="screen active" id="authScreen">
+            <h1 class="game-title">ثَقَلَین</h1>
+            <div class="language-select">
+                <button class="lang-btn" onclick="setLanguage('fa')">🇮🇷 فارسی</button>
+                <button class="lang-btn" onclick="setLanguage('ar')">🇸🇦 العربية</button>
+                <button class="lang-btn" onclick="setLanguage('en')">🇬🇧 English</button>
+            </div>
+            <div class="glass-card form-container">
+                <div class="form-group">
+                    <label id="usernameLabel">نام کاربری:</label>
+                    <input type="text" id="usernameInput" autocomplete="username" placeholder="نام کاربری">
+                </div>
+                <div class="form-group">
+                    <label id="passwordLabel">رمز عبور:</label>
+                    <input type="password" id="passwordInput" autocomplete="current-password" placeholder="رمز عبور">
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="handleLogin()" id="loginBtn">ورود</button>
+                    <button class="btn btn-secondary" onclick="handleRegister()" id="registerBtn">ثبت‌نام</button>
+                </div>
+                <p class="error-message" id="authError"></p>
+                <p class="success-message" id="authSuccess"></p>
+            </div>
+        </div>
+
+        <!-- صفحه انتخاب سطح -->
+        <div class="screen" id="levelScreen">
+            <h1 class="game-title">ثَقَلَین</h1>
+            <p class="game-subtitle" id="levelSubtitle">سطح بازی را انتخاب کنید</p>
+            <div class="levels-grid" id="levelsGrid"></div>
+        </div>
+
+        <!-- صفحه بازی -->
+        <div class="screen" id="gameScreen">
+            <div class="game-header">
+                <div class="question-counter">
+                    <span id="questionLabel">سؤال:</span>
+                    <span id="questionNum">1</span> / <span id="totalQuestions">10</span>
+                </div>
+                <div class="score-display">
+                    <span id="scoreLabel">امتیاز:</span>
+                    <span id="scoreDisplay">0</span>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="hint-text" id="hintText"></div>
+            <div class="answer-container" id="answerContainer"></div>
+            <div class="letter-circle-container">
+                <div class="circle-bg"></div>
+                <svg class="connection-svg" id="connectionSvg">
+                    <path class="connection-line" id="connectionPath" d=""></path>
+                </svg>
+                <div class="letter-circle" id="letterCircle"></div>
+            </div>
+            <div class="game-controls">
+                <button class="control-btn" onclick="clearSelection()" id="clearBtn">🗑️ پاک کردن</button>
+                <button class="control-btn" onclick="submitAnswer()" id="submitBtn">✓ تأیید</button>
+                <button class="control-btn" onclick="exitGame()" id="exitBtn">🚪 خروج</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال نتیجه -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <span class="modal-icon" id="modalIcon">✓</span>
+            <h2 class="modal-title" id="modalTitle">تبریک!</h2>
+            <p class="modal-message" id="modalMessage"></p>
+            <div id="modalAnswerContainer"></div>
+            <button class="btn btn-primary" onclick="handleModalClose()" id="modalBtn">ادامه</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== STATE ====================
+        let currentLang = localStorage.getItem('thaqalayn_lang') || 'fa';
+        let currentUser = null;
+        let currentLevel = null;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedLetters = [];
+        let selectedPositions = [];
+        let questions = [];
+        let audioPlaying = true;
+        let isLevelComplete = false;
+        let currentContentType = '';
+        let audioLoaded = false;
+        let autoPlayAttempted = false;
+
+        // ==================== API ====================
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const options = {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+            };
+            if (data) options.body = JSON.stringify(data);
+            try {
+                const response = await fetch(endpoint, options);
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                return { success: false, error: 'Network error' };
+            }
+        }
+
+        // ==================== بستن منوی کاربر ====================
+        function closeUserDropdown() {
+            const userDropdown = document.getElementById('userDropdownMenu');
+            if (userDropdown) userDropdown.classList.remove('show');
+        }
+
+        // ==================== مقداردهی اولیه ====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadPublicSettings();
+
+            // Apply saved language from localStorage
+            setLanguage(currentLang, false);
+
+            const result = await apiCall('/api/user/check');
+            if (result.logged_in) {
+                currentUser = { username: result.username, is_admin: result.is_admin };
+                showLoggedInUI();
+                showScreen('levelScreen');
+            } else {
+                showScreen('authScreen');
+            }
+
+            // پخش خودکار صدا (در هر دو حالت)
+            autoPlayAudio();
+
+            document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+
+            // دکمه صدا
+            const audioToggleBtn = document.getElementById('audioToggleBtn');
+            audioToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleAudio();
+            });
+
+            // منوی کاربر
+            const userInfoDiv = document.getElementById('userInfo');
+            const userDropdown = document.getElementById('userDropdownMenu');
+            if (userInfoDiv) {
+                userInfoDiv.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('show');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!userInfoDiv.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                    }
+                });
+            }
+
+            // درباره ما و راهنما
+            document.getElementById('aboutBtn').addEventListener('click', () => {
+                closeUserDropdown();
+                showAboutModal();
+            });
+            document.getElementById('helpBtn').addEventListener('click', () => {
+                closeUserDropdown();
+                showHelpModal();
+            });
+        });
+
+        // ==================== صدا ====================
+        async function autoPlayAudio() {
+            if (autoPlayAttempted || !audioLoaded) return;
+            autoPlayAttempted = true;
+            const audio = document.getElementById('bgAudio');
+            const btn = document.getElementById('audioToggleBtn');
+            try {
+                await audio.play();
+                audioPlaying = true;
+                btn.textContent = '🔊';
+                console.log('Auto-play started');
+            } catch (err) {
+                console.log('Autoplay was prevented:', err);
+                audioPlaying = false;
+                btn.textContent = '🔇';
+            }
+        }
+
+        async function loadPublicSettings() {
+            const result = await apiCall('/api/public/settings');
+            if (result.background_image) {
+                const bgUrl = `/uploads/backgrounds/${result.background_image}`;
+                const bgOverlay = document.getElementById('backgroundOverlay');
+
+                // Create a new Image to preload the background
+                const img = new Image();
+                img.onload = function() {
+                    bgOverlay.style.backgroundImage = `url(${bgUrl})`;
+                    // Hide loading overlay once background is loaded
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.classList.add('hidden');
+                        setTimeout(() => loadingOverlay.remove(), 500);
+                    }
+                };
+                img.onerror = function() {
+                    // Even if image fails, hide loading overlay
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.classList.add('hidden');
+                        setTimeout(() => loadingOverlay.remove(), 500);
+                    }
+                };
+                img.src = bgUrl;
+            } else {
+                // No background image set, hide loading overlay immediately
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.classList.add('hidden');
+                    setTimeout(() => loadingOverlay.remove(), 500);
+                }
+            }
+            if (result.background_audio) {
+                const audio = document.getElementById('bgAudio');
+                audio.src = `/uploads/audio/${result.background_audio}`;
+                audioLoaded = true;
+                audioPlaying = true;
+                document.getElementById('audioToggleBtn').textContent = '🔊';
+            }
+        }
+
+        function toggleAudio() {
+            const audio = document.getElementById('bgAudio');
+            const btn = document.getElementById('audioToggleBtn');
+            const t = translations[currentLang];
+            if (!audioLoaded || !audio.src) {
+                showMessage(t.audioNotSet, 'error');
+                return;
+            }
+            if (audioPlaying) {
+                audio.pause();
+                btn.textContent = '🔇';
+                audioPlaying = false;
+            } else {
+                audio.play().then(() => {
+                    btn.textContent = '🔊';
+                    audioPlaying = true;
+                }).catch(e => {
+                    console.error(e);
+                    showMessage(t.audioError, 'error');
+                });
+            }
+        }
+
+        // ==================== توابع رابط کاربری ====================
+        function showLoggedInUI() {
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('userDisplay').textContent = currentUser.username;
+            if (currentUser.is_admin) {
+                document.getElementById('adminDropdownItem').style.display = 'block';
+            }
+        }
+
+        function setLanguage(lang, saveToStorage = true) {
+            currentLang = lang;
+            // Save to localStorage to sync with admin panel
+            if (saveToStorage) {
+                localStorage.setItem('thaqalayn_lang', lang);
+            }
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'en' ? 'ltr' : 'rtl';
+            updateUIText();
+            if (currentUser) renderLevels();
+        }
+
+        const translations = {
+            fa: {
+                username: "نام کاربری:", password: "رمز عبور:",
+                login: "ورود", register: "ثبت‌نام",
+                selectLevel: "سطح بازی را انتخاب کنید",
+                easy: "ساده", medium: "متوسط", hard: "دشوار", expert: "خیلی دشوار",
+                letters: "حرف", questions: "سؤال",
+                question: "سؤال:", score: "امتیاز:",
+                clear: "🗑️ پاک کردن", submit: "✓ تأیید", exit: "🚪 خروج",
+                correct: "آفرین! پاسخ صحیح بود!",
+                wrong: "متأسفانه اشتباه بود",
+                correctAnswer: "پاسخ صحیح:",
+                levelComplete: "تبریک!",
+                levelCompleteMsg: "این مرحله را با موفقیت گذراندید!",
+                continue: "ادامه",
+                invalidLogin: "نام کاربری یا رمز عبور اشتباه است",
+                emptyFields: "لطفاً همه فیلدها را پر کنید",
+                locked: "ابتدا مرحله قبل را تکمیل کنید",
+                totalScore: "مجموع امتیاز:",
+                registerSuccess: "ثبت‌نام با موفقیت انجام شد! اکنون وارد شوید.",
+                about: "درباره ما",
+                help: "راهنما",
+                adminPanel: "پنل مدیریت",
+                logout: "خروج از حساب",
+                close: "بستن",
+                edit: "ویرایش",
+                save: "ذخیره",
+                cancel: "انصراف",
+                saveSuccess: "با موفقیت ذخیره شد",
+                noQuestions: "سوالی یافت نشد",
+                audioNotSet: "فایل صوتی تنظیم نشده است",
+                audioError: "خطا در پخش صدا",
+                aboutError: "خطا در دریافت اطلاعات درباره ما",
+                helpError: "خطا در دریافت راهنما",
+                registerError: "خطا در ثبت‌نام",
+                saveError: "خطا در ذخیره‌سازی",
+                usernamePlaceholder: "نام کاربری",
+                passwordPlaceholder: "رمز عبور"
+            },
+            ar: {
+                username: "اسم المستخدم:", password: "كلمة المرور:",
+                login: "دخول", register: "تسجيل",
+                selectLevel: "اختر مستوى اللعبة",
+                easy: "سهل", medium: "متوسط", hard: "صعب", expert: "صعب جداً",
+                letters: "حرف", questions: "سؤال",
+                question: "السؤال:", score: "النقاط:",
+                clear: "🗑️ مسح", submit: "✓ تأكيد", exit: "🚪 خروج",
+                correct: "أحسنت! الجواب صحيح!",
+                wrong: "للأسف، الجواب خاطئ",
+                correctAnswer: "الجواب الصحيح:",
+                levelComplete: "مبروك!",
+                levelCompleteMsg: "لقد أكملت هذه المرحلة بنجاح!",
+                continue: "استمر",
+                invalidLogin: "اسم المستخدم أو كلمة المرور غير صحيحة",
+                emptyFields: "يرجى ملء جميع الحقول",
+                locked: "أكمل المرحلة السابقة أولاً",
+                totalScore: "مجموع النقاط:",
+                registerSuccess: "تم التسجيل بنجاح! الآن قم بتسجيل الدخول.",
+                about: "من نحن",
+                help: "المساعدة",
+                adminPanel: "لوحة الإدارة",
+                logout: "تسجيل الخروج",
+                close: "إغلاق",
+                edit: "تعديل",
+                save: "حفظ",
+                cancel: "إلغاء",
+                saveSuccess: "تم الحفظ بنجاح",
+                noQuestions: "لم يتم العثور على أسئلة",
+                audioNotSet: "لم يتم تعيين ملف الصوت",
+                audioError: "خطأ في تشغيل الصوت",
+                aboutError: "خطأ في تحميل معلومات عنا",
+                helpError: "خطأ في تحميل المساعدة",
+                registerError: "خطأ في التسجيل",
+                saveError: "خطأ في الحفظ",
+                usernamePlaceholder: "اسم المستخدم",
+                passwordPlaceholder: "كلمة المرور"
+            },
+            en: {
+                username: "Username:", password: "Password:",
+                login: "Login", register: "Register",
+                selectLevel: "Select game level",
+                easy: "Easy", medium: "Medium", hard: "Hard", expert: "Expert",
+                letters: "letters", questions: "questions",
+                question: "Question:", score: "Score:",
+                clear: "🗑️ Clear", submit: "✓ Submit", exit: "🚪 Exit",
+                correct: "Excellent! Correct answer!",
+                wrong: "Sorry, that's incorrect",
+                correctAnswer: "Correct answer:",
+                levelComplete: "Congratulations!",
+                levelCompleteMsg: "You have completed this level!",
+                continue: "Continue",
+                invalidLogin: "Invalid username or password",
+                emptyFields: "Please fill all fields",
+                locked: "Complete previous level first",
+                totalScore: "Total Score:",
+                registerSuccess: "Registration successful! Now please login.",
+                about: "About Us",
+                help: "Help",
+                adminPanel: "Admin Panel",
+                logout: "Logout",
+                close: "Close",
+                edit: "Edit",
+                save: "Save",
+                cancel: "Cancel",
+                saveSuccess: "Saved successfully",
+                noQuestions: "No questions found",
+                audioNotSet: "Audio file not set",
+                audioError: "Error playing audio",
+                aboutError: "Error loading about info",
+                helpError: "Error loading help",
+                registerError: "Registration error",
+                saveError: "Save error",
+                usernamePlaceholder: "Username",
+                passwordPlaceholder: "Password"
+            }
+        };
+
+        function updateUIText() {
+            const t = translations[currentLang];
+            document.getElementById('usernameLabel').textContent = t.username;
+            document.getElementById('passwordLabel').textContent = t.password;
+            document.getElementById('loginBtn').textContent = t.login;
+            document.getElementById('registerBtn').textContent = t.register;
+            document.getElementById('levelSubtitle').textContent = t.selectLevel;
+            document.getElementById('questionLabel').textContent = t.question;
+            document.getElementById('scoreLabel').textContent = t.score;
+            document.getElementById('clearBtn').textContent = t.clear;
+            document.getElementById('submitBtn').textContent = t.submit;
+            document.getElementById('exitBtn').textContent = t.exit;
+
+            // به‌روزرسانی منوها و دکمه‌های جدید
+            document.getElementById('aboutBtn').textContent = '📖 ' + t.about;
+            document.getElementById('helpBtn').textContent = '❓ ' + t.help;
+            document.getElementById('adminDropdownItem').textContent = '👑 ' + t.adminPanel;
+            document.getElementById('logoutBtn').textContent = '🚪 ' + t.logout;
+
+            // placeholderهای ورودی
+            document.getElementById('usernameInput').placeholder = t.usernamePlaceholder;
+            document.getElementById('passwordInput').placeholder = t.passwordPlaceholder;
+
+            // دکمه‌های مودال محتوا (در صورت وجود)
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            if (closeModalBtn) closeModalBtn.textContent = t.close;
+
+            const saveContentBtn = document.getElementById('saveContentBtn');
+            if (saveContentBtn) saveContentBtn.textContent = '💾 ' + t.save;
+
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            if (cancelEditBtn) cancelEditBtn.textContent = '✕ ' + t.cancel;
+
+            const editContentBtn = document.getElementById('editContentBtn');
+            if (editContentBtn) editContentBtn.textContent = '✏️ ' + t.edit;
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            if (screenId === 'levelScreen' && currentUser) renderLevels();
+        }
+
+        function showMessage(text, type = 'success') {
+            const msgDiv = document.createElement('div');
+            msgDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 15px 30px;
+                border-radius: 10px;
+                color: white;
+                z-index: 3000;
+                animation: fadeIn 0.3s;
+                ${type === 'success' ? 'background: #00e676;' : 'background: #ff5252;'}
+            `;
+            msgDiv.textContent = text;
+            document.body.appendChild(msgDiv);
+            setTimeout(() => msgDiv.remove(), 3000);
+        }
+
+        // ==================== مودال‌های محتوا ====================
+        async function showAboutModal() {
+            currentContentType = 'about';
+            const result = await apiCall(`/api/content/about?lang=${currentLang}`);
+            const t = translations[currentLang];
+            if (result.success) openContentModal(result.content);
+            else showMessage(t.aboutError, 'error');
+        }
+
+        async function showHelpModal() {
+            currentContentType = 'help';
+            const result = await apiCall(`/api/content/help?lang=${currentLang}`);
+            const t = translations[currentLang];
+            if (result.success) openContentModal(result.content);
+            else showMessage(t.helpError, 'error');
+        }
+
+        function openContentModal(content) {
+            const modal = document.getElementById('contentModal');
+            document.getElementById('contentModalBody').textContent = content;
+            const actionsDiv = document.getElementById('contentActions');
+            const t = translations[currentLang];
+            actionsDiv.innerHTML = `<button class="btn btn-secondary" id="closeModalBtn" onclick="closeContentModal()">${t.close}</button>`;
+            if (currentUser && currentUser.is_admin) {
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn btn-primary';
+                editBtn.id = 'editContentBtn';
+                editBtn.style.marginLeft = '10px';
+                editBtn.textContent = '✏️ ' + t.edit;
+                editBtn.onclick = () => enableEditMode(content);
+                actionsDiv.appendChild(editBtn);
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeContentModal() {
+            document.getElementById('contentModal').style.display = 'none';
+            document.getElementById('editSection').style.display = 'none';
+            document.getElementById('contentModalBody').style.display = 'block';
+            const t = translations[currentLang];
+            document.getElementById('contentActions').innerHTML = `<button class="btn btn-secondary" id="closeModalBtn" onclick="closeContentModal()">${t.close}</button>`;
+        }
+
+        function enableEditMode(currentText) {
+            document.getElementById('contentModalBody').style.display = 'none';
+            document.getElementById('contentActions').style.display = 'none';
+            document.getElementById('editSection').style.display = 'block';
+            document.getElementById('contentEditArea').value = currentText;
+        }
+
+        function cancelEdit() {
+            document.getElementById('editSection').style.display = 'none';
+            document.getElementById('contentModalBody').style.display = 'block';
+            document.getElementById('contentActions').style.display = 'flex';
+        }
+
+        async function saveContent() {
+            const newContent = document.getElementById('contentEditArea').value;
+            const endpoint = currentContentType === 'help' ? '/api/admin/content/help' : '/api/admin/content/about';
+            const t = translations[currentLang];
+
+            // ارسال محتوا برای زبان جاری
+            const data = {};
+            data[`content_${currentLang}`] = newContent;
+
+            const result = await apiCall(endpoint, 'POST', data);
+            if (result.success) {
+                document.getElementById('contentModalBody').textContent = newContent;
+                cancelEdit();
+                showMessage(t.saveSuccess, 'success');
+            } else {
+                showMessage(result.error || t.saveError, 'error');
+            }
+        }
+
+        // ==================== احراز هویت ====================
+        async function handleLogin() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const t = translations[currentLang];
+            if (!username || !password) {
+                document.getElementById('authError').textContent = t.emptyFields;
+                return;
+            }
+            const result = await apiCall('/api/login', 'POST', { username, password });
+            if (result.success) {
+                currentUser = { username, is_admin: result.is_admin };
+                document.getElementById('usernameInput').value = '';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('authError').textContent = '';
+                showLoggedInUI();
+                showScreen('levelScreen');
+            } else {
+                document.getElementById('authError').textContent = t.invalidLogin;
+            }
+        }
+
+        async function handleRegister() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const t = translations[currentLang];
+            if (!username || !password) {
+                document.getElementById('authError').textContent = t.emptyFields;
+                return;
+            }
+            const result = await apiCall('/api/register', 'POST', { username, password });
+            if (result.success) {
+                document.getElementById('authSuccess').textContent = t.registerSuccess;
+                document.getElementById('passwordInput').value = '';
+            } else {
+                document.getElementById('authError').textContent = result.error || t.registerError;
+            }
+        }
+
+        async function logout() {
+            await apiCall('/api/logout');
+            const audio = document.getElementById('bgAudio');
+            audio.pause();
+            audioPlaying = false;
+            autoPlayAttempted = false;
+            document.getElementById('audioToggleBtn').textContent = '🔊';
+            currentUser = null;
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('adminDropdownItem').style.display = 'none';
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('passwordInput').value = '';
+            showScreen('authScreen');
+        }
+
+        // ==================== سطوح و بازی ====================
+        async function renderLevels() {
+            const t = translations[currentLang];
+            const levelNames = { easy: t.easy, medium: t.medium, hard: t.hard, expert: t.expert };
+            const result = await apiCall(`/api/game/levels?lang=${currentLang}`);
+            if (!result.levels) return;
+            const grid = document.getElementById('levelsGrid');
+            grid.innerHTML = result.levels.map(level => {
+                const letterCount = level.name === 'easy' ? 4 : level.name === 'medium' ? 5 : level.name === 'hard' ? 6 : 7;
+                const starCount = level.name === 'easy' ? 1 : level.name === 'medium' ? 2 : level.name === 'hard' ? 3 : 4;
+                return `
+                    <div class="level-card ${!level.accessible ? 'locked' : ''} ${level.completed ? 'completed' : ''}"
+                         onclick="${!level.accessible ? `alert('${t.locked}')` : `startLevel('${level.name}')`}">
+                        ${!level.accessible ? '<span class="lock-icon">🔒</span>' : ''}
+                        ${level.completed ? '<span class="check-icon">✓</span>' : ''}
+                        <div class="level-name">${levelNames[level.name]}</div>
+                        <div class="level-info">${letterCount} ${t.letters}</div>
+                        <div class="level-info">5 ${t.questions}</div>
+                        <div class="level-stars">${'⭐'.repeat(starCount)}</div>
+                        ${level.completed ? `<div class="level-info" style="margin-top: 8px; color: #00e676;">${t.score} ${level.score}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function startLevel(level) {
+            currentLevel = level;
+            currentQuestionIndex = 0;
+            score = 0;
+            isLevelComplete = false;
+            const result = await apiCall(`/api/game/questions?lang=${currentLang}&level=${level}`);
+            const t = translations[currentLang];
+            if (result.error) { alert(result.error); return; }
+            questions = result.questions || [];
+            if (questions.length === 0) { alert(t.noQuestions); return; }
+            document.getElementById('totalQuestions').textContent = questions.length;
+            document.getElementById('scoreDisplay').textContent = '0';
+            document.getElementById('progressBar').style.width = '0%';
+            showScreen('gameScreen');
+            loadQuestion();
+        }
+
+        function exitGame() { showScreen('levelScreen'); }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) { completeLevel(); return; }
+            const q = questions[currentQuestionIndex];
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('hintText').textContent = q.hint;
+            const progress = (currentQuestionIndex / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            const answerLetters = q.answer.split('');
+            const extraCount = currentLevel === 'easy' ? 0 : currentLevel === 'medium' ? 2 : currentLevel === 'hard' ? 4 : 7;
+            const extraLetters = generateExtraLetters(q.answer, extraCount);
+            const allLetters = shuffleArray([...answerLetters, ...extraLetters]);
+            document.getElementById('answerContainer').innerHTML = answerLetters.map(() => '<div class="answer-box"></div>').join('');
+            renderLetterCircle(allLetters);
+            selectedLetters = [];
+            selectedPositions = [];
+            updateConnectionLine();
+        }
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function generateExtraLetters(answer, count) {
+            const alphabets = {
+                'fa': 'ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهی',
+                'ar': 'ابتثجحخدذرزسشصضطظعغفقكلمنهوي',
+                'en': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            };
+            const alphabet = alphabets[currentLang] || alphabets['fa'];
+            const extras = [];
+            const answerSet = new Set(answer.split(''));
+            while (extras.length < count) {
+                const ch = alphabet[Math.floor(Math.random() * alphabet.length)];
+                if (!answerSet.has(ch) && !extras.includes(ch)) extras.push(ch);
+            }
+            return extras;
+        }
+
+        function renderLetterCircle(letters) {
+            const circle = document.getElementById('letterCircle');
+            const cx = 150, cy = 150, r = 110, btnSize = 58;
+            circle.innerHTML = letters.map((letter, idx) => {
+                const angle = (idx / letters.length) * 2 * Math.PI - Math.PI / 2;
+                const x = cx + r * Math.cos(angle) - btnSize / 2;
+                const y = cy + r * Math.sin(angle) - btnSize / 2;
+                const posX = cx + r * Math.cos(angle);
+                const posY = cy + r * Math.sin(angle);
+                return `<button class="letter-btn" style="left:${x}px;top:${y}px;" data-letter="${letter}" data-x="${posX}" data-y="${posY}">${letter}</button>`;
+            }).join('');
+            let selecting = false;
+            circle.querySelectorAll('.letter-btn').forEach(btn => {
+                btn.addEventListener('mousedown', () => { selecting = true; selectLetter(btn); });
+                btn.addEventListener('mouseenter', () => { if (selecting) selectLetter(btn); });
+                btn.addEventListener('touchstart', e => { e.preventDefault(); selectLetter(btn); }, { passive: false });
+            });
+            document.addEventListener('mouseup', () => selecting = false);
+            document.addEventListener('touchend', () => selecting = false);
+        }
+
+        function selectLetter(btn) {
+            if (!btn || btn.classList.contains('used')) return;
+            const letter = btn.dataset.letter;
+            btn.classList.add('selected', 'used');
+            selectedLetters.push(letter);
+            selectedPositions.push({ x: parseFloat(btn.dataset.x), y: parseFloat(btn.dataset.y) });
+            updateAnswerBoxes();
+            updateConnectionLine();
+        }
+
+        function updateAnswerBoxes() {
+            const boxes = document.querySelectorAll('.answer-box');
+            boxes.forEach((box, i) => {
+                if (selectedLetters[i]) {
+                    box.textContent = selectedLetters[i];
+                    box.classList.add('filled');
+                } else {
+                    box.textContent = '';
+                    box.classList.remove('filled');
+                }
+            });
+        }
+
+        function updateConnectionLine() {
+            const path = document.getElementById('connectionPath');
+            if (selectedPositions.length < 2) { path.setAttribute('d', ''); return; }
+            let d = `M ${selectedPositions[0].x} ${selectedPositions[0].y}`;
+            for (let i = 1; i < selectedPositions.length; i++) d += ` L ${selectedPositions[i].x} ${selectedPositions[i].y}`;
+            path.setAttribute('d', d);
+        }
+
+        function clearSelection() {
+            selectedLetters = [];
+            selectedPositions = [];
+            document.querySelectorAll('.letter-btn').forEach(btn => btn.classList.remove('selected', 'used'));
+            document.querySelectorAll('.answer-box').forEach(box => {
+                box.textContent = '';
+                box.classList.remove('filled', 'correct', 'wrong');
+            });
+            updateConnectionLine();
+        }
+
+        function submitAnswer() {
+            if (selectedLetters.length === 0) return;
+            const q = questions[currentQuestionIndex];
+            const userAnswer = selectedLetters.join('');
+            const boxes = document.querySelectorAll('.answer-box');
+            if (userAnswer === q.answer) {
+                boxes.forEach(b => b.classList.add('correct'));
+                score += 10;
+                document.getElementById('scoreDisplay').textContent = score;
+                setTimeout(() => showResultModal(true, q.answer), 600);
+            } else {
+                boxes.forEach(b => b.classList.add('wrong'));
+                setTimeout(() => showResultModal(false, q.answer), 600);
+            }
+        }
+
+        function showResultModal(isCorrect, answer) {
+            const t = translations[currentLang];
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('modalIcon');
+            const title = document.getElementById('modalTitle');
+            const msg = document.getElementById('modalMessage');
+            const ansCont = document.getElementById('modalAnswerContainer');
+            isLevelComplete = false;
+            if (isCorrect) {
+                icon.textContent = '✓'; icon.className = 'modal-icon success';
+                title.textContent = t.correct; msg.textContent = ''; ansCont.innerHTML = '';
+            } else {
+                icon.textContent = '✗'; icon.className = 'modal-icon error';
+                title.textContent = t.wrong; msg.textContent = t.correctAnswer;
+                ansCont.innerHTML = `<div class="modal-answer">${answer}</div>`;
+            }
+            document.getElementById('modalBtn').textContent = t.continue;
+            modal.classList.add('show');
+        }
+
+        async function handleModalClose() {
+            document.getElementById('resultModal').classList.remove('show');
+            if (isLevelComplete) {
+                isLevelComplete = false;
+                showScreen('levelScreen');
+            } else {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+        }
+
+        async function completeLevel() {
+            const t = translations[currentLang];
+            if (currentUser) {
+                await apiCall('/api/game/save_progress', 'POST', { lang: currentLang, level: currentLevel, score });
+            }
+            document.getElementById('modalIcon').textContent = '🏆';
+            document.getElementById('modalIcon').className = 'modal-icon trophy';
+            document.getElementById('modalTitle').textContent = t.levelComplete;
+            document.getElementById('modalMessage').textContent = t.levelCompleteMsg;
+            document.getElementById('modalAnswerContainer').innerHTML = `<div class="modal-answer">${t.totalScore} ${score}</div>`;
+            document.getElementById('modalBtn').textContent = t.continue;
+            isLevelComplete = true;
+            document.getElementById('resultModal').classList.add('show');
+        }
+    </script>
+</body>
+</html>

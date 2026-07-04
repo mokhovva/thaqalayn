@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- اضافه کردن PWA manifest و theme-color -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0a1a">
+<title>بازی ثقلین — جشنواره قرآن و عترت</title>
+<style>html,body{background:#0a3d2b!important}</style>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-pale: #f5e6b8;
+    --green-deep: #0a3d2b;
+    --green-mid: #145c3e;
+    --green-bright: #1e8a5a;
+    --cream: #fdf6e3;
+    --text-dark: #1a1208;
+    --text-muted: #5a4a2a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Vazirmatn', sans-serif;
+    background: var(--green-deep);
+    color: var(--cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Geometric background ── */
+  .bg-pattern {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, #1e5c3a55 0%, transparent 70%),
+      radial-gradient(ellipse 60% 80% at 100% 100%, #c9a84c18 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 0% 80%, #0a2e1e 0%, transparent 60%);
+  }
+
+  .arabesque {
+    position: fixed; inset: 0; z-index: 0; opacity: .07;
+    background-image:
+      repeating-linear-gradient(45deg, var(--gold) 0, var(--gold) 1px, transparent 0, transparent 50%),
+      repeating-linear-gradient(-45deg, var(--gold) 0, var(--gold) 1px, transparent 0, transparent 50%);
+    background-size: 40px 40px;
+  }
+
+  /* ── Layout ── */
+  .page { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 50px 24px 80px; }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    border-bottom: 1px solid #c9a84c44;
+    padding-bottom: 44px;
+    margin-bottom: 48px;
+    animation: fadeDown .9s ease both;
+  }
+
+  .festival-block {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid var(--gold);
+    border-radius: 3px;
+    padding: 12px 36px 14px;
+    margin-bottom: 28px;
+    background: linear-gradient(135deg, #c9a84c0e, #0a3d2b22);
+    position: relative;
+  }
+
+  .festival-block::before, .festival-block::after {
+    content: '';
+    position: absolute;
+    width: 6px; height: 6px;
+    border: 1px solid var(--gold);
+    background: var(--green-deep);
+    border-radius: 1px;
+  }
+  .festival-block::before { top: -4px; right: -4px; }
+  .festival-block::after  { bottom: -4px; left: -4px; }
+
+  .festival-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: .06em;
+  }
+
+  .festival-divider {
+    width: 36px; height: 1px;
+    background: #c9a84c55;
+    margin: 8px auto;
+  }
+
+  .ministry-name {
+    font-size: .82rem;
+    color: #9ab89c;
+    font-weight: 400;
+    letter-spacing: .03em;
+  }
+
+  .ornament { color: var(--gold); font-size: 1.1rem; margin: 0 6px; opacity: .6; }
+
+  .main-title {
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--gold-light);
+    text-shadow: 0 0 50px #c9a84c77, 0 2px 0 #7a5a10;
+    margin-bottom: 20px;
+    letter-spacing: .02em;
+  }
+
+  .subtitle-wrap {
+    display: inline-block;
+    color: #ff4444;
+    text-shadow: 0 0 18px #ff222266;
+    font-size: clamp(1.1rem, 3vw, 1.45rem);
+    font-weight: 800;
+    letter-spacing: .04em;
+    padding: 0 4px;
+  }
+
+  .subtitle-wrap::after {
+    content: '';
+    display: block;
+    height: 2px;
+    background: linear-gradient(to left, transparent, #ff4444, transparent);
+    margin-top: 8px;
+    border-radius: 1px;
+  }
+
+  /* ── Intro box ── */
+  .intro-card {
+    background: linear-gradient(135deg, #ffffff0c, #ffffff06);
+    border: 1px solid #c9a84c33;
+    border-radius: 4px;
+    padding: 32px 36px;
+    padding-top: 60px;
+    margin-bottom: 40px;
+    animation: fadeUp .9s .2s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .intro-card::before {
+    content: '﷽';
+    position: absolute;
+    top: -10px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    color: var(--gold);
+    opacity: .4;
+  }
+
+  .intro-card p {
+    line-height: 2;
+    color: #d8edd9;
+    font-size: 1rem;
+    text-align: justify;
+  }
+
+  .intro-card strong { color: var(--gold-light); }
+
+  /* ── Section titles ── */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to left, transparent, #c9a84c55);
+  }
+
+  .section-icon { font-size: 1.3rem; }
+
+  /* ── Features grid ── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+    animation: fadeUp .9s .35s ease both;
+  }
+
+  .feature-card {
+    background: #ffffff0a;
+    border: 1px solid #ffffff15;
+    border-radius: 4px;
+    padding: 22px 24px;
+    transition: border-color .25s, transform .25s;
+  }
+
+  .feature-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-3px);
+  }
+
+  .feature-icon { font-size: 1.8rem; margin-bottom: 10px; display: block; }
+
+  .feature-title {
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--gold-light);
+    margin-bottom: 6px;
+  }
+
+  .feature-desc {
+    font-size: .85rem;
+    color: #a8c4ac;
+    line-height: 1.8;
+  }
+
+  /* ── Comparison table ── */
+  .compare-wrap {
+    animation: fadeUp .9s .5s ease both;
+    margin-bottom: 48px;
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+  }
+
+  .compare-table thead tr {
+    background: #c9a84c22;
+  }
+
+  .compare-table th {
+    padding: 14px 20px;
+    text-align: right;
+    color: var(--gold-light);
+    font-weight: 700;
+    border-bottom: 2px solid var(--gold);
+  }
+
+  .compare-table td {
+    padding: 12px 20px;
+    border-bottom: 1px solid #ffffff10;
+    color: #c8e0ca;
+    vertical-align: top;
+    line-height: 1.7;
+  }
+
+  .compare-table tr:hover td { background: #ffffff06; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 600;
+  }
+
+  .badge-admin { background: #c9a84c33; color: var(--gold-light); border: 1px solid var(--gold); }
+  .badge-user  { background: #1e8a5a33; color: #5fd4a0; border: 1px solid #1e8a5a; }
+  .check { color: #4ecb8d; }
+  .cross { color: #e06060; }
+
+  /* ── Login box ── */
+  .login-box {
+    background: linear-gradient(135deg, #c9a84c18, #0a3d2b55);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 28px 36px;
+    margin-bottom: 48px;
+    animation: fadeUp .9s .65s ease both;
+  }
+
+  .login-box h3 {
+    color: var(--gold-light);
+    font-size: 1rem;
+    margin-bottom: 18px;
+    font-weight: 700;
+  }
+
+  .cred-row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .cred {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .9rem;
+  }
+
+  .cred-label {
+    color: #9ab89c;
+    font-size: .8rem;
+  }
+
+  .cred-value {
+    background: #ffffff14;
+    border: 1px solid #ffffff22;
+    padding: 4px 14px;
+    border-radius: 2px;
+    font-family: monospace;
+    color: var(--gold-light);
+    letter-spacing: .08em;
+  }
+
+  .note {
+    font-size: .82rem;
+    color: #8aad8c;
+    margin-top: 14px;
+    line-height: 1.8;
+  }
+
+  /* ── How to run ── */
+  .run-steps {
+    counter-reset: step;
+    list-style: none;
+    animation: fadeUp .9s .8s ease both;
+    margin-bottom: 48px;
+  }
+
+  .run-steps li {
+    counter-increment: step;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #ffffff0d;
+    color: #c0d8c2;
+    font-size: .9rem;
+    line-height: 1.8;
+  }
+
+  .run-steps li::before {
+    content: counter(step);
+    min-width: 32px; height: 32px;
+    background: var(--gold);
+    color: var(--green-deep);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900;
+    font-size: .85rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  code {
+    background: #0a2218;
+    border: 1px solid #ffffff22;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: 'Courier New', monospace;
+    font-size: .85em;
+    color: #7adba0;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding-top: 32px;
+    border-top: 1px solid #c9a84c33;
+    color: #6a8c6c;
+    font-size: .82rem;
+    animation: fadeUp .9s .95s ease both;
+  }
+
+  .footer .gold { color: var(--gold); }
+
+  /* ── Animations ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Launch button ── */
+  .launch-wrap {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeUp .9s .85s ease both;
+  }
+
+  .launch-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #c9a84c, #a07c2a);
+    color: var(--green-deep);
+    font-family: 'Vazirmatn', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    padding: 14px 48px;
+    border-radius: 2px;
+    text-decoration: none;
+    letter-spacing: .05em;
+    box-shadow: 0 4px 24px #c9a84c44;
+    transition: transform .2s, box-shadow .2s;
+    cursor: pointer;
+    border: none;
+    margin: 6px;
+  }
+
+  .launch-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px #c9a84c66;
+  }
+
+  .launch-btn.secondary {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    box-shadow: none;
+  }
+
+  /* ── Gameplay showcase ── */
+  .gameplay-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-bottom: 48px;
+    animation: fadeUp .9s .42s ease both;
+  }
+
+  .gameplay-desc {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .gameplay-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: #ffffff08;
+    border: 1px solid #ffffff12;
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+
+  .step-num {
+    min-width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--gold), #a07c2a);
+    color: var(--green-deep);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: .9rem;
+    flex-shrink: 0;
+  }
+
+  .step-text {
+    font-size: .88rem;
+    color: #c0d8c2;
+    line-height: 1.8;
+  }
+
+  .step-text strong { color: var(--gold-light); }
+  .step-text em { color: #8fcfa0; font-style: normal; }
+
+  .gameplay-visual {
+    background: #000000aa;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .visual-label {
+    font-size: .78rem;
+    color: var(--gold);
+    letter-spacing: .08em;
+    text-align: center;
+  }
+
+  .visual-hint {
+    font-size: .75rem;
+    color: #5a7a5c;
+    text-align: center;
+  }
+
+  #demoSvg { width: 100%; max-width: 240px; }
+
+  .answer-preview {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .answer-box {
+    width: 40px; height: 40px;
+    border: 2px solid #c9a84c55;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    color: var(--gold-light);
+    font-weight: 700;
+    background: #0a0a1a;
+    transition: all .3s;
+  }
+
+  .answer-box.filled {
+    border-color: var(--gold);
+    background: #c9a84c22;
+    box-shadow: 0 0 10px #c9a84c44;
+  }
+
+  .answer-box.correct { border-color: #4ecb8d; background: #4ecb8d22; color: #4ecb8d; }
+
+  @media (max-width: 640px) {
+    .gameplay-showcase { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .intro-card, .login-box { padding: 22px 18px; }
+    .compare-table th, .compare-table td { padding: 10px 12px; }
+  }
+</style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body>
+
+<div class="bg-pattern"></div>
+<div class="arabesque"></div>
+
+<div class="page">
+
+  <!-- ══ HEADER ══ -->
+  <header class="header">
+
+    <div class="festival-block">
+      <div class="festival-name">
+        <span class="ornament">✦</span>
+        جشنواره قرآن و عترت
+        <span class="ornament">✦</span>
+      </div>
+      <div class="festival-divider"></div>
+      <div class="ministry-name">وزارت بهداشت، درمان و آموزش پزشکی</div>
+    </div>
+
+    <h1 class="main-title">بازی آموزشی ثقلین</h1>
+
+    <div class="subtitle-wrap">معرفی نرم‌افزار برای داور محترم جشنواره</div>
+
+  </header>
+
+  <!-- ══ INTRO ══ -->
+  <div class="intro-card">
+    <br><br>
+    <p>
+      <strong>بازی ثقلین</strong> یک نرم‌افزار آموزشی تعاملی مذهبی است که با هدف یادگیری مفاهیم قرآنی و آشنایی با فرهنگ اهل‌بیت علیهم‌السلام طراحی شده است.
+      کاربران در قالب یک بازی تطبیق حروف، واژگان مرتبط با قرآن، ائمه اطهار و مفاهیم دینی را حدس می‌زنند.
+      این نرم‌افزار به‌صورت <strong>وب‌اپلیکیشن</strong> با فناوری Flask و SQLite توسعه یافته و از <strong>سه زبان فارسی، عربی و انگلیسی</strong> پشتیبانی می‌کند.
+    </p>
+  </div>
+
+  <!-- ══ FEATURES ══ -->
+  <div class="section-title"><span class="section-icon">🌟</span> ویژگی‌های کلیدی نرم‌افزار</div>
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <span class="feature-icon">🌍</span>
+      <div class="feature-title">پشتیبانی سه‌زبانه</div>
+      <div class="feature-desc">بازی به سه زبان فارسی، عربی و انگلیسی در دسترس است و هر زبان مجموعه سوالات مستقل دارد.</div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🎯</span>
+      <div class="feature-title">چهار سطح دشواری</div>
+      <div class="feature-desc">مراحل آسان، متوسط، سخت و خبره با تعداد حروف و سوالات متفاوت. هر مرحله با گذراندن مرحله قبل باز می‌شود.</div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">📖</span>
+      <div class="feature-title">محتوای قرآنی و عترتی</div>
+      <div class="feature-desc">سوالات شامل نام خداوند، ائمه اطهار، مکان‌های مقدس، مناسبت‌ها و مفاهیم دینی است.</div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">👤</span>
+      <div class="feature-title">سیستم کاربری</div>
+      <div class="feature-desc">ثبت‌نام و ورود امن برای هر کاربر. ذخیره پیشرفت و امتیاز هر کاربر در پایگاه داده.</div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🏆</span>
+      <div class="feature-title">ثبت امتیاز و پیشرفت</div>
+      <div class="feature-desc">بالاترین امتیاز کاربر برای هر مرحله و زبان ذخیره می‌شود و سابقه پیشرفت نمایش داده می‌شود.</div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🎵</span>
+      <div class="feature-title">موسیقی و تصویر پس‌زمینه</div>
+      <div class="feature-desc">ادمین می‌تواند تصویر پس‌زمینه و موسیقی محیطی بازی را آپلود و تنظیم کند.</div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🔐</span>
+      <div class="feature-title">پنل مدیریت (Admin)</div>
+      <div class="feature-desc">پنل اختصاصی برای مدیریت کاربران، تنظیمات بازی و ویرایش محتوای راهنما و درباره ما.</div>
+    </div>
+
+    <div class="feature-card">
+      <span class="feature-icon">🗃️</span>
+      <div class="feature-title">پایگاه داده SQLite</div>
+      <div class="feature-desc">ذخیره‌سازی خودکار اطلاعات کاربران، تنظیمات و پیشرفت بازی بدون نیاز به پیکربندی خارجی.</div>
+    </div>
+
+    <div class="feature-card" style="border-color: var(--gold); background: linear-gradient(135deg, #c9a84c12, #0a3d2b44);">
+      <span class="feature-icon">🔵</span>
+      <div class="feature-title">گیم‌پلی دایره‌ای تعاملی</div>
+      <div class="feature-desc">حروف در قالب دایره چیده می‌شوند. بازیکن با لمس و کشیدن انگشت روی حروف، آن‌ها را به هم متصل کرده و کلمه را می‌سازد — هم با ماوس و هم با لمس صفحه.</div>
+    </div>
+
+  </div>
+
+  <!-- ══ GAMEPLAY VISUAL ══ -->
+  <div class="section-title" style="margin-bottom:24px;"><span class="section-icon">🎮</span> مکانیزم گیم‌پلی — نحوه بازی</div>
+  <div class="gameplay-showcase">
+
+    <div class="gameplay-desc">
+      <div class="gameplay-step">
+        <div class="step-num">۱</div>
+        <div class="step-text"><strong>راهنمای سؤال</strong> در بالای صفحه نمایش داده می‌شود — مثلاً: <em>«لقب امام علی علیه السلام»</em></div>
+      </div>
+      <div class="gameplay-step">
+        <div class="step-num">۲</div>
+        <div class="step-text"><strong>حروف به‌صورت دایره‌ای</strong> روی صفحه چیده می‌شوند؛ شامل حروف پاسخ و چند حرف اضافه برای افزایش چالش.</div>
+      </div>
+      <div class="gameplay-step">
+        <div class="step-num">۳</div>
+        <div class="step-text"><strong>با لمس یا کلیک</strong> روی هر حرف و کشیدن به حرف بعدی، یک خط اتصال طلایی رسم می‌شود و حرف در جایگاه پاسخ قرار می‌گیرد.</div>
+      </div>
+      <div class="gameplay-step">
+        <div class="step-num">۴</div>
+        <div class="step-text">پس از تکمیل کلمه، دکمه <strong>«تأیید»</strong> زده می‌شود و نتیجه نمایش داده می‌شود.</div>
+      </div>
+    </div>
+
+    <div class="gameplay-visual">
+      <div class="visual-label">نمایش تعاملی گیم‌پلی</div>
+      <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" id="demoSvg">
+        <path id="demoPath" d="" stroke="#c9a84c" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+      </svg>
+      <div class="visual-hint">انیمیشن خودکار — مثال: کلمه «علی»</div>
+      <div class="answer-preview" id="answerPreview">
+        <div class="answer-box" id="ab0"></div>
+        <div class="answer-box" id="ab1"></div>
+        <div class="answer-box" id="ab2"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ COMPARISON TABLE ══ -->
+  <div class="compare-wrap">
+    <div class="section-title"><span class="section-icon">⚖️</span> تفاوت حالت ادمین و کاربر عادی</div>
+    <table class="compare-table">
+      <thead>
+        <tr><th>قابلیت</th><th><span class="badge badge-admin">👑 ادمین</span></th><th><span class="badge badge-user">🧑 کاربر عادی</span></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>ورود به پنل مدیریت</td><td><span class="check">✔ دسترسی کامل</span></td><td><span class="cross">✘ ندارد</span></td></tr>
+        <tr><td>مشاهده لیست همه کاربران</td><td><span class="check">✔ مشاهده و مدیریت</span></td><td><span class="cross">✘ ندارد</span></td></tr>
+        <tr><td>حذف کاربر</td><td><span class="check">✔ امکان‌پذیر</span></td><td><span class="cross">✘ ندارد</span></td></tr>
+        <tr><td>بازنشانی رمز عبور کاربران</td><td><span class="check">✔ امکان‌پذیر</span></td><td><span class="cross">✘ ندارد</span></td></tr>
+        <tr><td>آپلود تصویر پس‌زمینه</td><td><span class="check">✔ از پنل ادمین</span></td><td><span class="cross">✘ ندارد</span></td></tr>
+        <tr><td>آپلود موسیقی پس‌زمینه</td><td><span class="check">✔ از پنل ادمین</span></td><td><span class="cross">✘ ندارد</span></td></tr>
+        <tr><td>ویرایش محتوای راهنما (3 زبان)</td><td><span class="check">✔ از پنل ادمین</span></td><td><span class="cross">✘ ندارد</span></td></tr>
+        <tr><td>ویرایش محتوای «درباره ما» (3 زبان)</td><td><span class="check">✔ از پنل ادمین</span></td><td><span class="cross">✘ ندارد</span></td></tr>
+        <tr><td>دسترسی به تمام مراحل بازی</td><td><span class="check">✔ بدون محدودیت</span></td><td>پس از گذراندن مرحله قبل</td></tr>
+        <tr><td>بازی و کسب امتیاز</td><td><span class="check">✔</span></td><td><span class="check">✔</span></td></tr>
+        <tr><td>انتخاب زبان بازی</td><td><span class="check">✔ فارسی، عربی، انگلیسی</span></td><td><span class="check">✔ فارسی، عربی، انگلیسی</span></td></tr>
+        <tr><td>ثبت پیشرفت و امتیاز</td><td><span class="check">✔</span></td><td><span class="check">✔</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ ACCESS PLATFORMS ══ -->
+  <div class="section-title"><span class="section-icon">📱</span> نحوه دسترسی به نرم‌افزار</div>
+  <div class="features-grid" style="margin-bottom: 32px;">
+
+    <div class="feature-card" style="border-color: #c9a84c66;">
+      <span class="feature-icon">📦</span>
+      <div class="feature-title">نسخه اندروید (APK)</div>
+      <div class="feature-desc">فایل APK به‌صورت مستقیم برای داور ارسال شده است. روی گوشی یا تبلت اندروید نصب و اجرا می‌شود.</div>
+    </div>
+
+    <div class="feature-card" style="border-color: #c9a84c66;">
+      <span class="feature-icon">🌐</span>
+      <div class="feature-title">نسخه تحت وب (PWA)</div>
+      <div class="feature-desc">برای ویندوز، آیفون و سایر پلتفرم‌ها از طریق مرورگر در دسترس است. قابل نصب به‌عنوان اپلیکیشن روی دستگاه.</div>
+    </div>
+
+  </div>
+
+  <!-- ══ CREDENTIALS ══ -->
+  <div class="login-box">
+    <h3>🔑 اطلاعات ورود برای داور محترم</h3>
+    <div class="cred-row" style="margin-bottom: 16px;">
+      <div class="cred" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+        <span class="cred-label">🌐 آدرس نسخه وب (PWA) — برای ویندوز، آیفون و سایر پلتفرم‌ها</span>
+        <span class="cred-value" style="word-break:break-all; white-space:normal;">morteza213.pythonanywhere.com</span>
+      </div>
+    </div>
+    <div class="cred-row" style="margin-bottom: 16px;">
+      <div class="cred" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+        <span class="cred-label">👑 دسترسی به پنل مدیریت (Admin)</span>
+        <span class="cred-value" style="white-space:normal; line-height:1.7;">پس از ورود با نام کاربری ادمین، از منوی کاربر (بالا سمت راست) گزینه <strong style="color:var(--gold);">«پنل مدیریت»</strong> در دسترس است</span>
+      </div>
+    </div>
+    <div class="cred-row">
+      <div class="cred">
+        <span class="cred-label">نام کاربری ادمین</span>
+        <span class="cred-value">admin</span>
+      </div>
+      <div class="cred">
+        <span class="cred-label">رمز عبور</span>
+        <span class="cred-value">admin123</span>
+      </div>
+    </div>
+    <div class="note">
+      ⚠️ برای تجربه حالت کاربر عادی، پس از خروج از حساب ادمین می‌توانید یک حساب جدید ثبت‌نام کنید.
+      <br>
+      📱 نسخه APK اندروید نیز به‌صورت جداگانه ارسال شده است.
+    </div>
+  </div>
+
+  <!-- ══ LAUNCH ══ -->
+  <div class="launch-wrap">
+    <button class="launch-btn" id="launchGameBtn">▶ ورود به بازی</button>
+    </div>
+
+  <!-- ══ FOOTER ══ -->
+  <div class="footer">
+    <p>توسعه‌یافته برای <span class="gold">جشنواره قرآن و عترت</span> &nbsp;|&nbsp; بازی آموزشی ثقلین</p>
+    <p style="margin-top:8px; opacity:.5;">ساخته‌شده با ❤️ برای ترویج فرهنگ قرآنی و اهل‌بیت علیهم‌السلام</p>
+  </div>
+
+</div>
+
+<script>
+  // ── Demo animation (همان کد قبلی) ──
+  const cx = 150, cy = 150, r = 100;
+  const word = ['ع', 'ل', 'ی'];
+  const allLetters = ['ع', 'ب', 'ل', 'م', 'ی', 'ز', 'ن'];
+
+  const svg = document.getElementById('demoSvg');
+  const path = document.getElementById('demoPath');
+
+  const positions = [];
+  allLetters.forEach((letter, i) => {
+    const angle = (i / allLetters.length) * 2 * Math.PI - Math.PI / 2;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    positions.push({ x, y, letter });
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', 22);
+    circle.setAttribute('fill', '#0a1a12'); circle.setAttribute('stroke', '#c9a84c55');
+    circle.setAttribute('stroke-width', '1.5');
+    circle.id = 'lc_' + i;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y + 6);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('font-size', '16'); text.setAttribute('fill', '#e8c97a');
+    text.setAttribute('font-family', 'Vazirmatn, Tahoma, sans-serif');
+    text.textContent = letter;
+    g.appendChild(circle); g.appendChild(text);
+    svg.appendChild(g);
+  });
+
+  const answerIndices = word.map(l => allLetters.indexOf(l));
+  let step = 0;
+  let pathPoints = [];
+
+  function resetDemo() {
+    step = 0; pathPoints = [];
+    path.setAttribute('d', '');
+    allLetters.forEach((_, i) => {
+      const c = document.getElementById('lc_' + i);
+      if (c) { c.setAttribute('fill', '#0a1a12'); c.setAttribute('stroke', '#c9a84c55'); }
+    });
+    [0,1,2].forEach(i => {
+      const b = document.getElementById('ab' + i);
+      if (b) { b.textContent = ''; b.className = 'answer-box'; }
+    });
+    setTimeout(runStep, 900);
+  }
+
+  function runStep() {
+    if (step >= word.length) {
+      setTimeout(() => {
+        [0,1,2].forEach(i => {
+          const b = document.getElementById('ab' + i);
+          if (b) b.classList.add('correct');
+        });
+        setTimeout(resetDemo, 1800);
+      }, 400);
+      return;
+    }
+    const idx = answerIndices[step];
+    const pos = positions[idx];
+    const c = document.getElementById('lc_' + idx);
+    if (c) { c.setAttribute('fill', '#c9a84c33'); c.setAttribute('stroke', '#c9a84c'); }
+    pathPoints.push(pos);
+    if (pathPoints.length === 1) {
+      path.setAttribute('d', `M ${pos.x} ${pos.y}`);
+    } else {
+      const d = pathPoints.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(' ');
+      path.setAttribute('d', d);
+    }
+    const box = document.getElementById('ab' + step);
+    if (box) { box.textContent = word[step]; box.classList.add('filled'); }
+    step++;
+    setTimeout(runStep, 700);
+  }
+  setTimeout(runStep, 1200);
+
+  // ── هدایت به صفحه بازی هنگام کلیک روی دکمه ──
+  document.getElementById('launchGameBtn').addEventListener('click', function() {
+    window.location.href = '/game';
+  });
+</script>
+
+<!-- ثبت Service Worker برای PWA -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('Service Worker registered successfully:', reg))
+      .catch(err => console.log('Service Worker registration failed:', err));
+  }
+</script>
+</body>
+</html>
