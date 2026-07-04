@@ -5,7 +5,26 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///thaqalayn.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    import os
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+class Config:
+    SECRET_KEY = os.environ.get("SECRET_KEY", "thaqalayn-game-secret-key-2024")
+
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(BASE_DIR, "thaqalayn.db")
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+
+    @staticmethod
+    def init_upload_folders():
+        folders = ["backgrounds", "audio"]
+        for folder in folders:
+            os.makedirs(os.path.join(Config.UPLOAD_FOLDER, folder), exist_ok=True)
+
+Config.init_upload_folders()
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 مگابایت
     
