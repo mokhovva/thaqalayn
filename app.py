@@ -221,6 +221,13 @@ def can_access_level(user, lang, level):
     return progress is not None
 
 # ==================== ROUTES ====================
+def initialize_app():
+    with app.app_context():
+        db.create_all()
+        create_admin_user()
+        init_audio_file()
+
+initialize_app()
 @app.route('/')
 def intro():
     return render_template('intro_judge.html')
@@ -547,19 +554,14 @@ def serve_upload(filename):
 
 # ==================== MAIN ====================
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        create_admin_user()
-        init_audio_file()
-    
     print("=" * 50)
     print("🎮 ثقلین بازی")
-    print("🌐 وب: https://morteza213.pythonanywhere.com/")
-    print("🔗 Admin: https://morteza213.pythonanywhere.com/admin")
+    print("🌐 وب: Running...")
     print("👤 Username: admin | Password: admin123")
     print("=" * 50)
+
     app.run(
-    debug=False,
-    host='0.0.0.0',
-    port=int(os.environ.get("PORT", 5000))
-)
+        debug=False,
+        host='0.0.0.0',
+        port=int(os.environ.get("PORT", 5000))
+    )
